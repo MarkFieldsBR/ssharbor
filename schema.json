@@ -1,0 +1,152 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "SSHarbor Configuration",
+  "description": "Configuration file for SSHarbor VS Code extension",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "JSON Schema reference"
+    },
+    "defaults": {
+      "type": "object",
+      "description": "Default values for all vessels",
+      "properties": {
+        "shell": {
+          "type": "string",
+          "default": "/bin/zsh",
+          "description": "Default shell to use after SSH connection"
+        },
+        "user": {
+          "type": "string",
+          "default": "root",
+          "description": "Default SSH username"
+        },
+        "port": {
+          "type": "integer",
+          "default": 22,
+          "minimum": 1,
+          "maximum": 65535,
+          "description": "Default SSH port"
+        },
+        "identityFile": {
+          "type": "string",
+          "description": "Default SSH identity file (private key) path"
+        }
+      }
+    },
+    "fleets": {
+      "type": "array",
+      "description": "List of server fleets (groups)",
+      "items": {
+        "type": "object",
+        "required": ["name", "vessels"],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Fleet name",
+            "minLength": 1,
+            "maxLength": 50
+          },
+          "icon": {
+            "type": "string",
+            "description": "VS Code ThemeIcon name (e.g., 'cloud', 'server', 'database')",
+            "default": "folder"
+          },
+          "color": {
+            "type": "string",
+            "description": "Color for the fleet (CSS color value)",
+            "pattern": "^#[0-9a-fA-F]{6}$"
+          },
+          "collapsed": {
+            "type": "boolean",
+            "description": "Whether the fleet is collapsed by default",
+            "default": false
+          },
+          "defaults": {
+            "type": "object",
+            "description": "Default values for vessels in this fleet",
+            "properties": {
+              "user": {
+                "type": "string",
+                "description": "Default SSH username for this fleet"
+              },
+              "port": {
+                "type": "integer",
+                "minimum": 1,
+                "maximum": 65535,
+                "description": "Default SSH port for this fleet"
+              },
+              "identityFile": {
+                "type": "string",
+                "description": "Default SSH identity file for this fleet"
+              },
+              "shell": {
+                "type": "string",
+                "description": "Default shell for this fleet"
+              }
+            }
+          },
+          "vessels": {
+            "type": "array",
+            "description": "List of vessels (servers) in this fleet",
+            "items": {
+              "type": "object",
+              "required": ["host"],
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "Display name for the vessel",
+                  "maxLength": 50
+                },
+                "host": {
+                  "type": "string",
+                  "description": "Hostname or IP address",
+                  "pattern": "^[a-zA-Z0-9][a-zA-Z0-9.-]*$"
+                },
+                "user": {
+                  "type": "string",
+                  "description": "SSH username (overrides fleet/global defaults)"
+                },
+                "port": {
+                  "type": "integer",
+                  "minimum": 1,
+                  "maximum": 65535,
+                  "description": "SSH port (overrides fleet/global defaults)"
+                },
+                "identityFile": {
+                  "type": "string",
+                  "description": "SSH identity file path (supports ~ for home directory)"
+                },
+                "shell": {
+                  "type": "string",
+                  "description": "Shell to use after connection"
+                },
+                "tags": {
+                  "type": "array",
+                  "description": "Tags for filtering and organization",
+                  "items": {
+                    "type": "string",
+                    "pattern": "^[a-zA-Z0-9-]+$",
+                    "maxLength": 30
+                  }
+                },
+                "favorite": {
+                  "type": "boolean",
+                  "description": "Mark as favorite (appears in Favorites section)",
+                  "default": false
+                },
+                "notes": {
+                  "type": "string",
+                  "description": "Additional notes about this vessel",
+                  "maxLength": 500
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "required": ["fleets"]
+}
