@@ -1,9 +1,9 @@
 <p align="center">
-  <img src="resources/ssharbor-hero.png" alt="SSHarbor Banner" width="600">
+  <img src="https://raw.githubusercontent.com/MarkFieldsBR/ssharbor/main/resources/ssharbor-hero.png" alt="SSHarbor Banner" width="600">
 </p>
 
 <p align="center">
-  <img src="resources/icon.png" alt="SSHarbor Logo" width="70" style="margin-right:-10px"><img src="https://readme-typing-svg.herokuapp.com?font=Montserrat&weight=700&size=54&pause=1000&color=0077B6&center=true&vCenter=true&width=320&height=70&lines=SSHarbor" alt="SSHarbor">
+  <img src="https://raw.githubusercontent.com/MarkFieldsBR/ssharbor/main/resources/icon.png" alt="SSHarbor Logo" width="70" style="margin-right:-10px"><img src="https://readme-typing-svg.herokuapp.com?font=Montserrat&weight=700&size=54&pause=1000&color=0077B6&center=true&vCenter=true&width=320&height=70&lines=SSHarbor" alt="SSHarbor">
 </p>
 
 <h3 align="center">⚓ Your safe harbor for SSH connections</h3>
@@ -17,14 +17,14 @@
 </p>
 
 <p align="center">
-  <a href="https://marketplace.visualstudio.com/items?itemName=markfields-solutions.ssharbor">
-    <img src="https://img.shields.io/visual-studio-marketplace/v/markfields-solutions.ssharbor?style=for-the-badge&logo=visual-studio-code&logoColor=white&label=VS%20Code&color=007ACC" alt="VS Code Marketplace">
+  <a href="https://marketplace.visualstudio.com/items?itemName=marcostullyo.ssharbor">
+    <img src="https://img.shields.io/visual-studio-marketplace/v/marcostullyo.ssharbor?style=for-the-badge&logo=visual-studio-code&logoColor=white&label=VS%20Code&color=007ACC" alt="VS Code Marketplace">
   </a>
-  <a href="https://marketplace.visualstudio.com/items?itemName=markfields-solutions.ssharbor">
-    <img src="https://img.shields.io/visual-studio-marketplace/d/markfields-solutions.ssharbor?style=for-the-badge&color=brightgreen&label=Downloads" alt="Downloads">
+  <a href="https://marketplace.visualstudio.com/items?itemName=marcostullyo.ssharbor">
+    <img src="https://img.shields.io/visual-studio-marketplace/d/marcostullyo.ssharbor?style=for-the-badge&color=brightgreen&label=Downloads" alt="Downloads">
   </a>
-  <a href="https://marketplace.visualstudio.com/items?itemName=markfields-solutions.ssharbor&ssr=false#review-details">
-    <img src="https://img.shields.io/visual-studio-marketplace/r/markfields-solutions.ssharbor?style=for-the-badge&color=yellow&label=Rating" alt="Rating">
+  <a href="https://marketplace.visualstudio.com/items?itemName=marcostullyo.ssharbor&ssr=false#review-details">
+    <img src="https://img.shields.io/visual-studio-marketplace/r/marcostullyo.ssharbor?style=for-the-badge&color=yellow&label=Rating" alt="Rating">
   </a>
   <a href="LICENSE">
     <img src="https://img.shields.io/badge/License-MIT-blue?style=for-the-badge" alt="License">
@@ -40,7 +40,7 @@
 <br>
 
 <p align="center">
-  <img src="resources/demo.gif" alt="SSHarbor Demo" width="700">
+  <img src="https://raw.githubusercontent.com/MarkFieldsBR/ssharbor/main/resources/demo.gif" alt="SSHarbor Demo" width="700">
 </p>
 
 ---
@@ -62,7 +62,7 @@ Every time you need to connect:
 ## ⚓ Find Your Harbor
 
 <p align="center">
-  <img src="resources/screenshot-main.png" alt="SSHarbor Main Interface" width="800">
+  <img src="https://raw.githubusercontent.com/MarkFieldsBR/ssharbor/main/resources/screenshot-main.png" alt="SSHarbor Main Interface" width="800">
 </p>
 
 **SSHarbor** transforms chaos into clarity:
@@ -175,7 +175,7 @@ Open VS Code → Extensions → Search **"SSHarbor"** → Install
 
 Or via command line:
 ```bash
-code --install-extension markfields-solutions.ssharbor
+code --install-extension marcostullyo.ssharbor
 ```
 
 ### 2. Create Your First Fleet
@@ -415,7 +415,7 @@ MIT — Use it, modify it, ship it.
 <h2 align="center">🚀 Ready to dock your connections?</h2>
 
 <p align="center">
-  <a href="https://marketplace.visualstudio.com/items?itemName=markfields-solutions.ssharbor">
+  <a href="https://marketplace.visualstudio.com/items?itemName=marcostullyo.ssharbor">
     <img src="https://img.shields.io/badge/⬇️%20Install%20SSHarbor-VS%20Code%20Marketplace-007ACC?style=for-the-badge&logo=visual-studio-code&logoColor=white" alt="Install SSHarbor">
   </a>
 </p>
@@ -433,7 +433,5 @@ MIT — Use it, modify it, ship it.
 </p>
 
 <p align="center">
-  <a href="https://ko-fi.com/marcostullyo">
-    <img src="https://ko-fi.com/img/githubbutton_sm.svg" alt="Support me on Ko-fi">
-  </a>
+  <a href="https://ko-fi.com/marcostullyo">☕ Support me on Ko-fi</a>
 </p>
