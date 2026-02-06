@@ -2,7 +2,7 @@
   "name": "ssharbor",
   "displayName": "SSHarbor",
   "description": "Your safe harbor for SSH connections - Organize fleets, connect vessels with confidence",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "publisher": "marcostullyo",
   "author": {
     "name": "Marcos Tullyo",
