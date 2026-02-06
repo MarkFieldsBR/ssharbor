@@ -5,6 +5,45 @@ All notable changes to SSHarbor will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.2] - 2026-02-05
+
+### ✨ New Features
+
+#### Drag & Drop Support
+- **Reorder Vessels** — Drag vessels to reorder within a fleet
+- **Move Between Fleets** — Drag vessels from one fleet to another
+- **Reorder Fleets** — Drag fleets to change their order in the tree
+
+#### Import from SSH Config
+- **Import Command** — New "Import from SSH Config" in welcome screen and command palette
+- **Host Selection** — Pick which hosts to import from `~/.ssh/config`
+- **Fleet Options** — Create new fleet or merge into existing
+- **Smart Parsing** — Handles Host, HostName, User, Port, and IdentityFile directives
+
+### 🎨 Improvements
+
+- **Improved Welcome Screen** — Cleaner layout with better icons and organization
+- **Auto-clear Recent** — Recent connections cleared when all fleets/vessels are deleted
+
+### 🐛 Bug Fixes
+
+- **Publisher Migration** — Automatic data migration when publisher ID changes (prevents data loss)
+
+---
+
+## [1.0.1] - 2026-02-05
+
+### 🐛 Bug Fixes
+
+- **Image URLs** — Fixed absolute URLs for images in README
+- **Connect Behavior** — Simplified connect to always open home directory
+
+### 🔒 Security
+
+- **Config Corruption Protection** — Prevent data loss on corrupted config file
+
+---
+
 ## [1.0.0] - 2026-02-05
 
 ### 🚀 Initial Release
