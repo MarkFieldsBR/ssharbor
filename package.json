@@ -2,7 +2,7 @@
   "name": "ssharbor",
   "displayName": "SSHarbor",
   "description": "Your safe harbor for SSH connections - Organize fleets, connect vessels with confidence",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "publisher": "marcostullyo",
   "author": {
     "name": "Marcos Tullyo",
@@ -104,7 +104,7 @@
     "viewsWelcome": [
       {
         "view": "ssharbor.harbor",
-        "contents": "$(symbol-event) Welcome aboard!\n\nSSHarbor organizes your SSH connections into fleets for quick, one-click access.\n\n[$(plus) Create Fleet](command:ssharbor.createFleet)\n[$(arrow-down) Import from ~/.ssh/config](command:ssharbor.importSshConfig)\n\n━━━━━━━━━━━━━━━━━━━━━━\n\n[$(settings-gear) Configuration](command:ssharbor.editConfig)\n[$(github) GitHub](https://github.com/MarkFieldsBR/ssharbor)"
+        "contents": "$(symbol-event) Welcome aboard!\n\nSSHarbor organizes your SSH connections into fleets for quick, one-click access.\n\n[$(plus) Create Fleet](command:ssharbor.createFleet)\n[$(arrow-down) Import from ~/.ssh/config](command:ssharbor.importSshConfig)\n[$(cloud-download) Import](command:ssharbor.importConfig)\n\n━━━━━━━━━━━━━━━━━━━━━━\n\n[$(settings-gear) Configuration](command:ssharbor.editConfig)\n[$(github) GitHub](https://github.com/MarkFieldsBR/ssharbor)"
       }
     ],
     "commands": [
@@ -203,6 +203,18 @@
         "title": "Import from SSH Config",
         "category": "SSHarbor",
         "icon": "$(cloud-download)"
+      },
+      {
+        "command": "ssharbor.importConfig",
+        "title": "Import Configuration",
+        "category": "SSHarbor",
+        "icon": "$(cloud-download)"
+      },
+      {
+        "command": "ssharbor.exportConfig",
+        "title": "Export Configuration",
+        "category": "SSHarbor",
+        "icon": "$(cloud-upload)"
       }
     ],
     "keybindings": [
@@ -240,6 +252,11 @@
           "command": "ssharbor.importSshConfig",
           "when": "view == ssharbor.harbor",
           "group": "navigation@5"
+        },
+        {
+          "command": "ssharbor.exportConfig",
+          "when": "view == ssharbor.harbor",
+          "group": "navigation@6"
         }
       ],
       "view/item/context": [

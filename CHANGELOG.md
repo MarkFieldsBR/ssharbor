@@ -5,6 +5,21 @@ All notable changes to SSHarbor will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.3] - 2026-02-05
+
+### ✨ New Features
+
+#### Import/Export Configuration
+- **Export Configuration** — Export all fleets or select specific ones to JSON file
+- **Import Configuration** — Import fleets from JSON file with merge/replace/rename options
+- **Conflict Resolution** — Smart handling when importing fleets that already exist
+
+### 🎨 Improvements
+
+- **Welcome Screen** — Added Import button, Export moved to toolbar (only shows when fleets exist)
+
+---
+
 ## [1.0.2] - 2026-02-05
 
 ### ✨ New Features
