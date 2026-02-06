@@ -9,7 +9,10 @@ import {
   SpacerItem,
   SSHConnectionInfo,
   MutableConnectionInfo,
+  Vessel,
 } from '../types';
+
+const DRAG_MIME_TYPE = 'application/vnd.code.tree.ssharbor';
 
 /**
  * Tree data provider for the SSHarbor Harbor view.
@@ -29,7 +32,7 @@ import {
  * vscode.window.createTreeView('ssharbor.harbor', { treeDataProvider: provider });
  * ```
  */
-export class HarborTreeProvider implements vscode.TreeDataProvider<HarborTreeItem> {
+export class HarborTreeProvider implements vscode.TreeDataProvider<HarborTreeItem>, vscode.TreeDragAndDropController<HarborTreeItem> {
   /** Event emitter for tree data changes */
   private _onDidChangeTreeData = new vscode.EventEmitter<HarborTreeItem | undefined | null | void>();
 
@@ -39,6 +42,10 @@ export class HarborTreeProvider implements vscode.TreeDataProvider<HarborTreeIte
   /** Current filter text for searching vessels */
   private filterText: string = '';
 
+  /** Drag and drop MIME types */
+  readonly dropMimeTypes = [DRAG_MIME_TYPE];
+  readonly dragMimeTypes = [DRAG_MIME_TYPE];
+
   /**
    * Creates a new HarborTreeProvider.
    *
@@ -47,6 +54,119 @@ export class HarborTreeProvider implements vscode.TreeDataProvider<HarborTreeIte
   constructor(private configManager: ConfigManager) {
     // Refresh on config changes
     configManager.onConfigChange(() => this.refresh());
+  }
+
+  /**
+   * Handle drag start - store dragged items
+   */
+  handleDrag(
+    source: readonly HarborTreeItem[],
+    dataTransfer: vscode.DataTransfer,
+    _token: vscode.CancellationToken
+  ): void {
+    // Only allow dragging vessels and fleets
+    const draggableItems = source.filter(
+      (item) => item instanceof VesselItem || item instanceof FleetItem
+    );
+
+    if (draggableItems.length > 0) {
+      const data = draggableItems.map((item) => {
+        if (item instanceof VesselItem) {
+          return {
+            type: 'vessel',
+            vesselHost: item.vessel.host,
+            fleetName: item.fleet.name,
+          };
+        } else if (item instanceof FleetItem) {
+          return {
+            type: 'fleet',
+            fleetName: item.fleet.name,
+          };
+        }
+        return null;
+      }).filter(Boolean);
+
+      dataTransfer.set(DRAG_MIME_TYPE, new vscode.DataTransferItem(JSON.stringify(data)));
+    }
+  }
+
+  /**
+   * Handle drop - move items to new location
+   */
+  async handleDrop(
+    target: HarborTreeItem | undefined,
+    dataTransfer: vscode.DataTransfer,
+    _token: vscode.CancellationToken
+  ): Promise<void> {
+    const transferItem = dataTransfer.get(DRAG_MIME_TYPE);
+    if (!transferItem) {
+      return;
+    }
+
+    const data = JSON.parse(transferItem.value) as Array<{
+      type: 'vessel' | 'fleet';
+      vesselHost?: string;
+      fleetName: string;
+    }>;
+
+    const config = this.configManager.loadConfig();
+
+    for (const item of data) {
+      if (item.type === 'vessel' && item.vesselHost) {
+        // Moving a vessel
+        const sourceFleet = config.fleets.find((f) => f.name === item.fleetName);
+        if (!sourceFleet) continue;
+
+        const vesselIndex = sourceFleet.vessels.findIndex((v) => v.host === item.vesselHost);
+        if (vesselIndex === -1) continue;
+
+        const [vessel] = sourceFleet.vessels.splice(vesselIndex, 1);
+
+        if (target instanceof FleetItem) {
+          // Drop on a fleet - add to that fleet
+          const targetFleet = config.fleets.find((f) => f.name === target.fleet.name);
+          if (targetFleet) {
+            targetFleet.vessels.push(vessel);
+          }
+        } else if (target instanceof VesselItem) {
+          // Drop on a vessel - insert before/after in same fleet
+          const targetFleet = config.fleets.find((f) => f.name === target.fleet.name);
+          if (targetFleet) {
+            const targetIndex = targetFleet.vessels.findIndex((v) => v.host === target.vessel.host);
+            if (targetIndex !== -1) {
+              targetFleet.vessels.splice(targetIndex, 0, vessel);
+            } else {
+              targetFleet.vessels.push(vessel);
+            }
+          }
+        } else {
+          // Drop on root or undefined - put back in source fleet
+          sourceFleet.vessels.push(vessel);
+        }
+      } else if (item.type === 'fleet') {
+        // Moving a fleet (reordering)
+        const fleetIndex = config.fleets.findIndex((f) => f.name === item.fleetName);
+        if (fleetIndex === -1) continue;
+
+        const [fleet] = config.fleets.splice(fleetIndex, 1);
+
+        if (target instanceof FleetItem) {
+          // Insert before target fleet
+          const targetIndex = config.fleets.findIndex((f) => f.name === target.fleet.name);
+          if (targetIndex !== -1) {
+            config.fleets.splice(targetIndex, 0, fleet);
+          } else {
+            config.fleets.push(fleet);
+          }
+        } else {
+          // Drop at end
+          config.fleets.push(fleet);
+        }
+      }
+    }
+
+    this.configManager.saveConfig(config);
+    this.refresh();
   }
 
   /**

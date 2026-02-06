@@ -2,7 +2,7 @@
   "name": "ssharbor",
   "displayName": "SSHarbor",
   "description": "Your safe harbor for SSH connections - Organize fleets, connect vessels with confidence",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "publisher": "marcostullyo",
   "author": {
     "name": "Marcos Tullyo",
@@ -104,7 +104,7 @@
     "viewsWelcome": [
       {
         "view": "ssharbor.harbor",
-        "contents": "Welcome to SSHarbor!\n\nYour safe harbor for SSH connections.\n\n[Create your first Fleet](command:ssharbor.createFleet)\n\n[Open Configuration](command:ssharbor.editConfig)\n\n[Learn more](https://github.com/markfields/ssharbor)"
+        "contents": "$(symbol-event) Welcome aboard!\n\nSSHarbor organizes your SSH connections into fleets for quick, one-click access.\n\n[$(plus) Create Fleet](command:ssharbor.createFleet)\n[$(arrow-down) Import from ~/.ssh/config](command:ssharbor.importSshConfig)\n\n━━━━━━━━━━━━━━━━━━━━━━\n\n[$(settings-gear) Configuration](command:ssharbor.editConfig)\n[$(github) GitHub](https://github.com/MarkFieldsBR/ssharbor)"
       }
     ],
     "commands": [
@@ -197,6 +197,12 @@
         "title": "Save Current Folder",
         "category": "SSHarbor",
         "icon": "$(save)"
+      },
+      {
+        "command": "ssharbor.importSshConfig",
+        "title": "Import from SSH Config",
+        "category": "SSHarbor",
+        "icon": "$(cloud-download)"
       }
     ],
     "keybindings": [
@@ -229,6 +235,11 @@
           "command": "ssharbor.editConfig",
           "when": "view == ssharbor.harbor",
           "group": "navigation@4"
+        },
+        {
+          "command": "ssharbor.importSshConfig",
+          "when": "view == ssharbor.harbor",
+          "group": "navigation@5"
         }
       ],
       "view/item/context": [

@@ -68,10 +68,12 @@ export function activate(context: vscode.ExtensionContext): void {
   // Initialize tree provider
   const treeProvider = new HarborTreeProvider(configManager);
 
-  // Register tree view
+  // Register tree view with drag and drop support
   const treeView = vscode.window.createTreeView('ssharbor.harbor', {
     treeDataProvider: treeProvider,
     showCollapseAll: true,
+    dragAndDropController: treeProvider,
+    canSelectMany: true,
   });
 
   // Remember collapsed state

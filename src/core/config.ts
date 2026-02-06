@@ -15,6 +15,9 @@ const CONFIG_FILENAME = 'harbor.json';
 const RECENT_FILENAME = 'recent.json';
 const VESSEL_PATHS_FILENAME = 'vessel-paths.json';
 
+// Legacy publisher IDs for migration
+const LEGACY_PUBLISHERS = ['markfields-solutions'];
+
 /**
  * Vessel paths storage
  */
@@ -41,6 +44,63 @@ export class ConfigManager {
 
     // Ensure storage directory exists
     this.ensureStorageDir();
+
+    // Migrate from legacy publisher storage if needed
+    this.migrateFromLegacyStorage();
+  }
+
+  /**
+   * Migrate data from legacy publisher storage directories
+   * This handles cases where the publisher ID changed
+   */
+  private migrateFromLegacyStorage(): void {
+    // Skip if current config already exists
+    if (fs.existsSync(this.configPath)) {
+      return;
+    }
+
+    const globalStorageParent = path.dirname(this.context.globalStorageUri.fsPath);
+    const extensionName = 'ssharbor';
+
+    for (const legacyPublisher of LEGACY_PUBLISHERS) {
+      const legacyPath = path.join(globalStorageParent, `${legacyPublisher}.${extensionName}`);
+
+      if (!fs.existsSync(legacyPath)) {
+        continue;
+      }
+
+      const legacyConfigPath = path.join(legacyPath, CONFIG_FILENAME);
+      if (!fs.existsSync(legacyConfigPath)) {
+        continue;
+      }
+
+      console.log(`SSHarbor: Found legacy storage at ${legacyPath}, migrating...`);
+
+      try {
+        // Migrate all data files
+        const filesToMigrate = [CONFIG_FILENAME, RECENT_FILENAME, VESSEL_PATHS_FILENAME];
+
+        for (const filename of filesToMigrate) {
+          const legacyFile = path.join(legacyPath, filename);
+          const newFile = path.join(this.context.globalStorageUri.fsPath, filename);
+
+          if (fs.existsSync(legacyFile) && !fs.existsSync(newFile)) {
+            fs.copyFileSync(legacyFile, newFile);
+            console.log(`SSHarbor: Migrated ${filename}`);
+          }
+        }
+
+        vscode.window.showInformationMessage(
+          'SSHarbor: Data migrated from previous installation successfully!'
+        );
+        return; // Stop after first successful migration
+      } catch (error) {
+        console.error('SSHarbor: Migration failed:', error);
+        vscode.window.showWarningMessage(
+          `SSHarbor: Failed to migrate data from previous installation. Check console for details.`
+        );
+      }
+    }
   }
 
   /**

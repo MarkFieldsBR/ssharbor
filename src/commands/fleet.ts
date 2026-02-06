@@ -31,6 +31,13 @@ export async function removeFleet(
 
   try {
     configManager.removeFleet(fleetName);
+
+    // Clear recent if no more fleets exist
+    const config = configManager.loadConfig();
+    if (config.fleets.length === 0) {
+      configManager.clearRecent();
+    }
+
     vscode.window.showInformationMessage(`SSHarbor: Fleet "${fleetName}" removed`);
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error);
@@ -69,6 +76,14 @@ export async function removeVessel(
       vesselItem.connectionInfo.fleetName,
       vesselItem.connectionInfo.host
     );
+
+    // Clear recent if no more vessels exist in any fleet
+    const config = configManager.loadConfig();
+    const totalVessels = config.fleets.reduce((sum, f) => sum + f.vessels.length, 0);
+    if (totalVessels === 0) {
+      configManager.clearRecent();
+    }
+
     vscode.window.showInformationMessage(
       `SSHarbor: Vessel "${vesselItem.connectionInfo.name}" removed`
     );

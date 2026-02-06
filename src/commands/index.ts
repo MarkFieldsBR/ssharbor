@@ -5,6 +5,7 @@ import { registerConnectCommands } from './connect';
 import { registerQuickConnectCommands } from './quick-connect';
 import { registerCopyCommands } from './copy';
 import { registerFleetCommands } from './fleet';
+import { registerImportSshConfigCommand } from './import-ssh-config';
 
 /**
  * Register all SSHarbor commands
@@ -18,9 +19,11 @@ export function registerAllCommands(
   registerQuickConnectCommands(context, configManager);
   registerCopyCommands(context);
   registerFleetCommands(context, configManager, provider);
+  registerImportSshConfigCommand(context, configManager, provider);
 }
 
 export { registerConnectCommands } from './connect';
 export { registerQuickConnectCommands } from './quick-connect';
 export { registerCopyCommands } from './copy';
 export { registerFleetCommands } from './fleet';
+export { registerImportSshConfigCommand } from './import-ssh-config';
