@@ -66,30 +66,29 @@ export class ConfigManager {
 
   /**
    * Load harbor configuration
+   * CRITICAL: Throws error on parse failure to prevent data loss
    */
   loadConfig(): HarborConfig {
-    try {
-      if (!fs.existsSync(this.configPath)) {
-        return { fleets: [] };
-      }
-
-      const content = fs.readFileSync(this.configPath, 'utf-8');
-      const config = JSON.parse(content) as HarborConfig;
-
-      // Ensure fleets array exists
-      if (!Array.isArray(config.fleets)) {
-        config.fleets = [];
-      }
-
-      return config;
-    } catch (error) {
-      console.error('SSHarbor: Error loading config:', error);
+    if (!fs.existsSync(this.configPath)) {
       return { fleets: [] };
     }
+
+    const content = fs.readFileSync(this.configPath, 'utf-8');
+
+    // Parse JSON - let errors propagate to prevent silent data loss
+    const config = JSON.parse(content) as HarborConfig;
+
+    // Ensure fleets array exists
+    if (!Array.isArray(config.fleets)) {
+      config.fleets = [];
+    }
+
+    return config;
   }
 
   /**
    * Save harbor configuration
+   * Uses atomic write (write to temp, then rename) to prevent corruption
    * Uses chmod 0o600 to ensure file is only readable by owner
    */
   saveConfig(config: HarborConfig): void {
@@ -99,12 +98,19 @@ export class ConfigManager {
       // Add schema reference
       config.$schema = './schema.json';
 
-      fs.writeFileSync(this.configPath, JSON.stringify(config, null, 2), 'utf-8');
+      const content = JSON.stringify(config, null, 2);
 
-      // Set secure permissions (owner read/write only)
+      // Atomic write: write to temp file first, then rename
+      const tempPath = `${this.configPath}.tmp`;
+      fs.writeFileSync(tempPath, content, 'utf-8');
+
+      // Set secure permissions before rename
       if (os.platform() !== 'win32') {
-        fs.chmodSync(this.configPath, 0o600);
+        fs.chmodSync(tempPath, 0o600);
       }
+
+      // Atomic rename (prevents corruption if crash during write)
+      fs.renameSync(tempPath, this.configPath);
 
       this._onConfigChange.fire();
     } catch (error) {
@@ -115,18 +121,25 @@ export class ConfigManager {
 
   /**
    * Save config without triggering change event (for UI state like collapsed)
+   * Uses atomic write to prevent corruption
    * Uses chmod 0o600 to ensure file is only readable by owner
    */
   saveConfigSilent(config: HarborConfig): void {
     try {
       this.ensureStorageDir();
       config.$schema = './schema.json';
-      fs.writeFileSync(this.configPath, JSON.stringify(config, null, 2), 'utf-8');
 
-      // Set secure permissions (owner read/write only)
+      const content = JSON.stringify(config, null, 2);
+
+      // Atomic write
+      const tempPath = `${this.configPath}.tmp`;
+      fs.writeFileSync(tempPath, content, 'utf-8');
+
       if (os.platform() !== 'win32') {
-        fs.chmodSync(this.configPath, 0o600);
+        fs.chmodSync(tempPath, 0o600);
       }
+
+      fs.renameSync(tempPath, this.configPath);
     } catch (error) {
       console.error('SSHarbor: Error saving config:', error);
     }
@@ -178,27 +191,47 @@ export class ConfigManager {
 
   /**
    * Add a fleet
+   * Throws error if config cannot be loaded (prevents data loss)
    */
   addFleet(fleet: Fleet): void {
-    const config = this.loadConfig();
-    config.fleets.push(fleet);
-    this.saveConfig(config);
+    try {
+      const config = this.loadConfig();
+      config.fleets.push(fleet);
+      this.saveConfig(config);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      throw new Error(`Cannot add fleet - config load failed: ${message}. Your existing config may be corrupted.`);
+    }
   }
 
   /**
    * Remove a fleet by name
+   * Throws error if config cannot be loaded (prevents data loss)
    */
   removeFleet(fleetName: string): void {
-    const config = this.loadConfig();
-    config.fleets = config.fleets.filter((f) => f.name !== fleetName);
-    this.saveConfig(config);
+    try {
+      const config = this.loadConfig();
+      config.fleets = config.fleets.filter((f) => f.name !== fleetName);
+      this.saveConfig(config);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      throw new Error(`Cannot remove fleet - config load failed: ${message}`);
+    }
   }
 
   /**
    * Add vessel to fleet
+   * Throws error if config cannot be loaded (prevents data loss)
    */
   addVessel(fleetName: string, vessel: Vessel): void {
-    const config = this.loadConfig();
+    let config: HarborConfig;
+    try {
+      config = this.loadConfig();
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      throw new Error(`Cannot add vessel - config load failed: ${message}`);
+    }
+
     const fleet = config.fleets.find((f) => f.name === fleetName);
 
     if (!fleet) {
@@ -211,9 +244,17 @@ export class ConfigManager {
 
   /**
    * Remove vessel from fleet
+   * Throws error if config cannot be loaded (prevents data loss)
    */
   removeVessel(fleetName: string, vesselHost: string): void {
-    const config = this.loadConfig();
+    let config: HarborConfig;
+    try {
+      config = this.loadConfig();
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      throw new Error(`Cannot remove vessel - config load failed: ${message}`);
+    }
+
     const fleet = config.fleets.find((f) => f.name === fleetName);
 
     if (!fleet) {
@@ -226,9 +267,17 @@ export class ConfigManager {
 
   /**
    * Toggle vessel favorite
+   * Throws error if config cannot be loaded (prevents data loss)
    */
   toggleFavorite(fleetName: string, vesselHost: string): boolean {
-    const config = this.loadConfig();
+    let config: HarborConfig;
+    try {
+      config = this.loadConfig();
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      throw new Error(`Cannot toggle favorite - config load failed: ${message}`);
+    }
+
     const fleet = config.fleets.find((f) => f.name === fleetName);
 
     if (!fleet) {
@@ -248,14 +297,20 @@ export class ConfigManager {
 
   /**
    * Set fleet collapsed state
+   * Silently fails if config cannot be loaded (UI state only, not critical)
    */
   setFleetCollapsed(fleetName: string, collapsed: boolean): void {
-    const config = this.loadConfig();
-    const fleet = config.fleets.find((f) => f.name === fleetName);
+    try {
+      const config = this.loadConfig();
+      const fleet = config.fleets.find((f) => f.name === fleetName);
 
-    if (fleet) {
-      fleet.collapsed = collapsed;
-      this.saveConfigSilent(config); // Silent save - don't trigger refresh
+      if (fleet) {
+        fleet.collapsed = collapsed;
+        this.saveConfigSilent(config); // Silent save - don't trigger refresh
+      }
+    } catch (error) {
+      // Collapsed state is non-critical UI state, log and continue
+      console.error('SSHarbor: Error saving collapsed state:', error);
     }
   }
 
