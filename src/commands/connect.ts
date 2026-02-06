@@ -12,76 +12,18 @@ export async function connect(
   info: SSHConnectionInfo
 ): Promise<void> {
   try {
-    // Get saved paths for this vessel
-    const savedPaths = configManager.getVesselSavedPaths(info.host, info.user, info.port);
     const homePath = info.user === 'root' ? '/root' : `/home/${info.user}`;
-
-    let selectedPath = homePath;
-
-    // If there are saved paths, show QuickPick
-    if (savedPaths.length > 0) {
-      const items: vscode.QuickPickItem[] = [
-        {
-          label: '$(home) Home',
-          description: homePath,
-          detail: 'Open home directory',
-        },
-        { label: '', kind: vscode.QuickPickItemKind.Separator },
-        ...savedPaths.map((p) => ({
-          label: `$(folder) ${p.split('/').pop() || p}`,
-          description: p,
-          detail: 'Recently opened folder',
-        })),
-        { label: '', kind: vscode.QuickPickItemKind.Separator },
-        {
-          label: '$(edit) Custom path...',
-          description: 'Enter a custom path',
-          detail: 'Type a folder path manually',
-        },
-      ];
-
-      const selected = await vscode.window.showQuickPick(items, {
-        title: `📂 Choose folder for ${info.name}`,
-        placeHolder: 'Select a folder to open',
-      });
-
-      if (!selected) {
-        return; // User cancelled
-      }
-
-      if (selected.label === '$(edit) Custom path...') {
-        const customPath = await vscode.window.showInputBox({
-          title: 'Enter folder path',
-          prompt: `Path on ${info.name}`,
-          value: homePath,
-          placeHolder: '/path/to/folder',
-        });
-
-        if (!customPath) {
-          return; // User cancelled
-        }
-
-        selectedPath = customPath;
-      } else if (selected.description) {
-        selectedPath = selected.description;
-      }
-    }
 
     // Ensure SSH config entry exists with correct identity file
     const sshAlias = ensureSSHConfigEntry(info);
 
-    // Build the remote URI
-    const remoteUri = vscode.Uri.parse(`vscode-remote://ssh-remote+${sshAlias}${selectedPath}`);
+    // Build the remote URI - always open home directory
+    const remoteUri = vscode.Uri.parse(`vscode-remote://ssh-remote+${sshAlias}${homePath}`);
 
     // Open folder in new window with Remote SSH
     await vscode.commands.executeCommand('vscode.openFolder', remoteUri, {
       forceNewWindow: true,
     });
-
-    // Save the path if it's not home
-    if (selectedPath !== homePath) {
-      configManager.addVesselPath(info.host, info.user, info.port, selectedPath);
-    }
 
     // Add to recent connections
     configManager.addRecent({
